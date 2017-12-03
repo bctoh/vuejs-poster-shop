@@ -9,9 +9,16 @@ new Vue({
 			{ id: 2, title: 'Item 2' },
 			{ id: 3, title: 'Item 3' }
 		],
-		cart: []
+		cart: [],
+		search: ''
 	},
 	methods: {
+		onSubmit: function() {
+			this.$http.get('/search/'.concat(this.search))
+			.then(function(res) {
+				this.items = res.data;
+			});
+		},
 		addItem: function(index) {
 			this.total += 9.99;
 			var item = this.items[index];
@@ -20,6 +27,7 @@ new Vue({
 				if (this.cart[i].id === item.id) {
 					found = true;
 					this.cart[i].qty++;
+					break;
 				}
 			}
 			if (!found) {
@@ -29,6 +37,20 @@ new Vue({
 					qty: 1,
 					price: PRICE
 				});
+			}
+		},
+		inc: function(item) {
+			item.qty++;
+			this.total += PRICE;
+		},
+		dec: function(item) {
+			item.qty--;
+			this.total -= PRICE;
+			if (item.qty <= 0) {
+				for (var i = 0; i < this.cart.length; i++) {
+					this.cart.splice(i, 1);
+					break;
+				}
 			}
 		}
 	},
